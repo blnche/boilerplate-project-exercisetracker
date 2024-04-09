@@ -51,7 +51,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     const userId = req.params._id;
     const user = await User.findById({_id: userId});
 
-    const date = req.body.date ? req.body.date : new Date().toDateString();
+    const date = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString();
     console.log('date' +date)
 
     const description = req.body.description;
@@ -71,9 +71,15 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     }
     
     
-    res.json({_id: user._id, username: user.username, description: exercise.description, duration: exercise.duration, date: exercise.date});
+    res.json({
+      _id: user._id, 
+      username: user.username, 
+      description: exercise.description, 
+      duration: exercise.duration, 
+      date: exercise.date});
     
   } catch (error) {
+
     res.json({error: error});
   }
 });
