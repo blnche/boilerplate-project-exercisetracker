@@ -71,7 +71,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     }
     
     
-    res.json({user, exercise});
+    res.json({user: user, description: description, duration: duration, date: date});
     
   } catch (error) {
     res.json({error: error});
@@ -84,7 +84,6 @@ app.get('/api/users/:_id/logs', async (req, res) => {
     const user = await User.findById({_id: userId});
     
     const log = await Log.findOne({username: user.username});
-    console.log(log.log.length);
 
     res.json({user: user, count: log.log.length, log: log.log});
 
