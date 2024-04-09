@@ -40,7 +40,7 @@ app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find().select('username _id');
 
-    res.json({users: users});
+    res.json(users);
   } catch (error) {
     res.json({error: error});
   }
@@ -51,19 +51,28 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     const userId = req.params._id;
     const user = await User.findById({_id: userId});
 
-    const date = req.body.date;
-    if (!date) {
-      date = new Date().toDateString();
-    }
+    const date = req.body.date ? req.body.date : new Date().toDateString();
+    console.log('date' +date)
 
     const description = req.body.description;
     const duration = parseInt(req.body.duration);
 
     const exercise = await Exercise.create({username: user.username, description: description, duration: duration, date: date});
 
+    const userLogsCount = await Log.countDocuments({username: user.username});
 
-    res.json({user: user, exercise: exercise});
+    if(userLogsCount == 0) {
+      const log = await Log.create({username: user.username, count:userLogsCount, log: [{description: description, duration: duration, date: date}]});
 
+    } else {
+      const log = await Log.findOne({username: user.username});
+      log.log.push({description: description, duration: duration, date: date});
+      await log.save();
+    }
+    
+    
+    res.json({user, exercise});
+    
   } catch (error) {
     res.json({error: error});
   }
@@ -72,10 +81,12 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 app.get('/api/users/:_id/logs', async (req, res) => {
   try {
     const userId = req.params._id;
-    const user = User.findById({_id: userId});
+    const user = await User.findById({_id: userId});
+    
+    const log = await Log.findOne({username: user.username});
+    console.log(log.log.length);
 
-
-    res.json({});
+    res.json({user: user, count: log.log.length, log: log.log});
 
   } catch (error) {
     res.json({error: error});
