@@ -87,33 +87,27 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       return;
     }
 
-    let dateObj = {};
-    const {from, to, limit} = req.query;
-    if(from) {
-      dateObj["$gte"] = new Date(from);
-    }
-    if(to) {
-      dateObj['$lte'] = new Date(to);
-    }
+    let filter = {};
 
-    if( req.params.from || req.params.to) {
-      const from = req.params.from;
-      const to = req.params.to;
-    }
-    
-    if (req.params.limit) {
-      const limit = req.params.limit
-    }
-    
-    let filter = {
+    filter = {
       username: user.username
     }
 
-    if('options') {
+    let dateObj = {};
+    const {from, to, limit} = req.query;
+
+    if( from ) {
+      dateObj["$gte"] = new Date(from);
+    }
+    if( to ) {
+      dateObj['$lte'] = new Date(to);
+    }
+    
+    if( from || to ) {
       filter.date = dateObj;
     }
     
-    const exercises = await Exercise.find(filter);
+    const exercises = await Exercise.find(filter).limit(parseInt(limit) ?? 500);
 
     const log = exercises.map(item => ({
       description: item.description,
