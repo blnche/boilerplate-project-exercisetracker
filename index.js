@@ -62,14 +62,22 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     const description = req.body.description;
     const duration = parseInt(req.body.duration);
 
-    const exercise = await Exercise.create({username: user.username, description: description, duration: duration, date: date.toDateString()});
+    const exercise = await Exercise.create({username: user.username, description: description, duration: duration, date: date});
+
+    console.log({
+      _id: user._id, 
+      username: user.username, 
+      description: exercise.description, 
+      duration: exercise.duration, 
+      date: new Date(exercise.date).toDateString()
+    });
 
     res.json({
       _id: user._id, 
       username: user.username, 
       description: exercise.description, 
       duration: exercise.duration, 
-      date: exercise.date.toDateString()
+      date: exercise.date
     });
     
   } catch (error) {
@@ -103,7 +111,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
     }
     
     if (req.params.limit) {
-      const limit = paresInt(req.params.limit)
+      const limit = req.params.limit
     }
     
     let filter = {
@@ -120,15 +128,10 @@ app.get('/api/users/:_id/logs', async (req, res) => {
     const log = exercises.map(item => ({
       description: item.description,
       duration: item.duration,
-      date: item.date.toDateString()
+      date: item.date
     }));
     
-    res.json({
-      username: user.username, 
-      count: exercises.length, 
-      _id: user._id,
-      log
-    });
+    res.json({user: user, count: log.length, log: log});
 
   } catch (error) {
     res.json({error: error});
