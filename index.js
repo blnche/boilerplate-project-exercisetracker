@@ -56,7 +56,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       return;
     }
 
-    const date = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString();
+    const date = req.body.date ? new Date(req.body.date) : new Date();
     console.log('date' +date)
 
     const description = req.body.description;
@@ -69,7 +69,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       username: user.username, 
       description: exercise.description, 
       duration: exercise.duration, 
-      date: exercise.date
+      date: exercise.date.toDateString()
     });
     
   } catch (error) {
@@ -103,7 +103,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
     }
     
     if (req.params.limit) {
-      const limit = req.params.limit
+      const limit = paresInt(req.params.limit)
     }
     
     let filter = {
