@@ -51,6 +51,11 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     const userId = req.params._id;
     const user = await User.findById({_id: userId});
 
+    if (!user) {
+      console.log('User not found');
+      return;
+    }
+
     const date = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString();
     console.log('date' +date)
 
@@ -59,14 +64,6 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 
     const exercise = await Exercise.create({username: user.username, description: description, duration: duration, date: date});
 
-    const userLogsCount = await Log.countDocuments({username: user.username});
-
-    
-      const log = await Log.create({username: user.username, count:userLogsCount, log: [{description: description, duration: duration, date: date}]});
-
-    
-    
-    
     res.json({
       _id: user._id, 
       username: user.username, 
@@ -80,16 +77,25 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
   }
 });
 
-app.get('/api/users/:_id/logs?from&to&limit', async (req, res) => {
+app.get('/api/users/:_id/logs', async (req, res) => {
   try {
     const userId = req.params._id;
-
-    
-    
     const user = await User.findById({_id: userId});
-    
-    const log = await Log.findOne({username: user.username});
-    
+  
+    if(!user) {
+      console.log('User not found');
+      return;
+    }
+
+    let dateObj = {};
+    const {from, to, limit} = req.query;
+    if(from) {
+      dateObj["$gte"] = new Date(from);
+    }
+    if(to) {
+      dateObj['$lte'] = new Date(to);
+    }
+
     if( req.params.from || req.params.to) {
       const from = req.params.from;
       const to = req.params.to;
@@ -98,7 +104,25 @@ app.get('/api/users/:_id/logs?from&to&limit', async (req, res) => {
     if (req.params.limit) {
       const limit = req.params.limit
     }
-    res.json({user: user, count: log.log.length, log: log.log});
+    
+    let filter = {
+      username: user.username
+    }
+
+    if('options') {
+      filter.date = dateObj;
+    }
+    
+    const exercises = await Exercise.find(filter).limit(+limit ?? 500);
+    console.log(exercises);
+
+    const log = exercises.map(item => ({
+      description: item.description,
+      duration: item.duration,
+      date: item.date
+    }));
+    
+    res.json({user: user, count: log.length, log: log});
 
   } catch (error) {
     res.json({error: error});
