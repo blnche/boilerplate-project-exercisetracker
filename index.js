@@ -109,9 +109,9 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       username: user.username
     }
 
-    // if('options') {
-    //   filter.date = dateObj;
-    // }
+    if('options') {
+      filter.date = dateObj;
+    }
     
     const exercises = await Exercise.find(filter);
 
