@@ -61,14 +61,10 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 
     const userLogsCount = await Log.countDocuments({username: user.username});
 
-    if(userLogsCount == 0) {
+    
       const log = await Log.create({username: user.username, count:userLogsCount, log: [{description: description, duration: duration, date: date}]});
 
-    } else {
-      const log = await Log.findOne({username: user.username});
-      log.log.push({description: description, duration: duration, date: date});
-      await log.save();
-    }
+    
     
     
     res.json({
@@ -84,13 +80,24 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
   }
 });
 
-app.get('/api/users/:_id/logs', async (req, res) => {
+app.get('/api/users/:_id/logs?from&to&limit', async (req, res) => {
   try {
     const userId = req.params._id;
+
+    
+    
     const user = await User.findById({_id: userId});
     
     const log = await Log.findOne({username: user.username});
-
+    
+    if( req.params.from || req.params.to) {
+      const from = req.params.from;
+      const to = req.params.to;
+    }
+    
+    if (req.params.limit) {
+      const limit = req.params.limit
+    }
     res.json({user: user, count: log.log.length, log: log.log});
 
   } catch (error) {
