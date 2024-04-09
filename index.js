@@ -120,12 +120,12 @@ app.get('/api/users/:_id/logs', async (req, res) => {
     const log = exercises.map(item => ({
       description: item.description,
       duration: item.duration,
-      date: item.date
+      date: item.date.toDateString()
     }));
     
     res.json({
       username: user.username, 
-      count: log.length, 
+      count: exercises.length, 
       _id: user._id,
       log
     });
