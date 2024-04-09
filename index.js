@@ -69,7 +69,8 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       username: user.username, 
       description: exercise.description, 
       duration: exercise.duration, 
-      date: exercise.date});
+      date: exercise.date
+    });
     
   } catch (error) {
 
@@ -122,7 +123,12 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       date: item.date
     }));
     
-    res.json({user: user, count: log.length, log: log});
+    res.json({
+      username: user.username, 
+      count: log.length, 
+      _id: user._id,
+      log
+    });
 
   } catch (error) {
     res.json({error: error});
