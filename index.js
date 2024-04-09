@@ -56,7 +56,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       return;
     }
 
-    const date = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString();
+    const date = req.body.date ? new Date(req.body.date) : new Date();
 
     const description = req.body.description;
     const duration = parseInt(req.body.duration);
@@ -68,7 +68,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       username: user.username, 
       description: exercise.description, 
       duration: exercise.duration, 
-      date: exercise.date
+      date: exercise.date.toDateString()
     });
     
   } catch (error) {
@@ -109,16 +109,16 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       username: user.username
     }
 
-    if('options') {
-      filter.date = dateObj;
-    }
+    // if('options') {
+    //   filter.date = dateObj;
+    // }
     
     const exercises = await Exercise.find(filter);
 
     const log = exercises.map(item => ({
       description: item.description,
       duration: item.duration,
-      date: item.date
+      date: item.date.toDateString()
     }));
     
     res.json({
