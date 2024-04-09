@@ -71,7 +71,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     }
     
     
-    res.json({username: user.username, description: description, duration: duration, date: date});
+    res.json({username: user.username, description: exercise.description, duration: exercise.duration, date: exercise.date});
     
   } catch (error) {
     res.json({error: error});
